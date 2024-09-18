@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Unzip and Download Files</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+				html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    overflow: hidden; /* Disable scrolling */
+    touch-action: none; /* Prevent zooming on touch devices */
+    position: relative;
+    background: linear-gradient(135deg, #89fffd, #ef32d9); /* Background gradient */
+    color: #fff; /* Text color */
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Poppins', sans-serif;
+    overflow: hidden;
+    position: fixed; /* Fix position to prevent scrolling */
+}
+
+.container {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 25px;
+    width: 97%;
+    max-width: 2000px;
+    max-height: 80vh;
+    overflow-y: auto;
+    text-align: center;
+    animation: fadeIn 1s ease-in-out;
+    margin-top: 6%;
+    position: relative;
+}
+
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .tab-buttons {
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons button {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px 20px;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .tab-buttons button.active {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .tab-buttons button:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .input-container {
+            --c-text: rgb(50, 50, 80);
+            --c-bg: rgb(252, 252, 252);
+            --c-outline: rgb(55, 45 , 190);
+            display: grid;
+            gap: 1ch;
+            position: relative;
+            max-width: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: black;
+            margin-bottom: 20px;
+        }
+
+        .input-field {
+            padding: 0.5em 0.75em;
+            border-radius: 0.2em;
+            border: 1px solid var(--c-border, currentColor);
+            color: var(--c-text);
+            font-size: 1rem;
+            letter-spacing: 0.1ch;
+            width: 100%;
+        }
+
+        .input-field:not(:placeholder-shown) + .input-label {
+            transform: translateY(-220%);
+            opacity: 1;
+        }
+
+        .input-field:invalid {
+            --c-border: rgb(230, 85, 60);
+            --c-text: rgb(230, 85, 60);
+            --c-outline: rgb(230, 85, 60);
+        }
+
+        .input-field:is(:disabled, :read-only) {
+            --c-border: rgb(150, 150, 150);
+            --c-text: rgb(170, 170, 170);
+        }
+
+        .input-field:is(:focus, :focus-visible) {
+            outline: 2px solid var(--c-outline);
+            outline-offset: 2px;
+        }
+
+        .input-label {
+            --timing: 200ms ease-in;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transition: transform var(--timing),
+                opacity var(--timing);
+            transform: translateY(-50%);
+            opacity: 0;
+            color: var(--c-text);
+            font-weight: 500;
+        }
+
+        .file-input {
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            border-radius: 8px;
+            width: 100%;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .file-input::file-selector-button {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.3);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .file-input::file-selector-button:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        button {
+            background-color: #ff3e96;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            cursor: pointer;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ff69b4;
+            transform: scale(1.05);
+        }
+
+        #output {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 10px;
+            border-radius: 8px;
+            color: #fff;
+            transition: background-color 0.3s ease;
+        }
+
+        .file-item:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .file-item button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .file-item button:hover {
+            background-color: #0056b3;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>[ZIP] فـك الـضـغـط</h1>
+        <div class="tab-buttons">
+            <button id="urlTab" class="active">URL</button>
+            <button id="fileTab">File</button>
+        </div>
+
+        <div id="urlSection">
+            <div class="input-container">
+                <input type="text" id="zipUrlInput" placeholder="Enter ZIP file URL" class="input-field" />
+                <label class="input-label" for="zipUrlInput">URL</label>
+            </div>
+            <button onclick="unzipFromUrl()">فـك الـضـغـط</button>
+        </div>
+
+        <div id="fileSection" class="hidden">
+            <input type="file" id="zipFileInput" accept=".zip" class="file-input"/>
+            <button onclick="unzipFile()">فـك الـضـغـط</button>
+        </div>
+
+        <div id="output"></div>
+    </div>
+
+    <script>
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+        }
+
+        document.getElementById('urlTab').addEventListener('click', function() {
+            clearOutput(); // Clear output when switching to URL tab
+            document.getElementById('urlSection').classList.remove('hidden');
+            document.getElementById('fileSection').classList.add('hidden');
+            this.classList.add('active');
+            document.getElementById('fileTab').classList.remove('active');
+        });
+
+        document.getElementById('fileTab').addEventListener('click', function() {
+            clearOutput(); // Clear output when switching to File tab
+            document.getElementById('fileSection').classList.remove('hidden');
+            document.getElementById('urlSection').classList.add('hidden');
+            this.classList.add('active');
+            document.getElementById('urlTab').classList.remove('active');
+        });
+
+        function unzipFile() {
+            clearOutput(); // Clear previous output
+
+            const zipFileInput = document.getElementById('zipFileInput');
+            const outputDiv = document.getElementById('output');
+
+            if (zipFileInput.files.length === 0) {
+                alert('Please select a ZIP file.');
+                return;
+            }
+
+            const file = zipFileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                JSZip.loadAsync(e.target.result)
+                    .then(function(zip) {
+                        outputDiv.innerHTML = '<h3>Files:</h3>';
+                        Object.keys(zip.files).forEach(function(filename) {
+                            zip.files[filename].async('blob').then(function(content) {
+                                const fileItem = document.createElement('div');
+                                fileItem.className = 'file-item';
+
+                                const fileNameSpan = document.createElement('span');
+                                fileNameSpan.textContent = filename;
+
+                                const downloadButton = document.createElement('button');
+                                downloadButton.textContent = 'Download';
+                                downloadButton.onclick = function() {
+                                    const blobURL = URL.createObjectURL(content);
+                                    const a = document.createElement('a');
+                                    a.href = blobURL;
+                                    a.download = filename;
+                                    a.click();
+                                    URL.revokeObjectURL(blobURL); // Release the memory
+                                };
+
+                                fileItem.appendChild(fileNameSpan);
+                                fileItem.appendChild(downloadButton);
+                                outputDiv.appendChild(fileItem);
+                            });
+                        });
+                    })
+                    .catch(function(err) {
+                        console.error('Error reading ZIP file:', err);
+                    });
+            };
+
+            reader.readAsArrayBuffer(file);
+        }
+
+        function unzipFromUrl() {
+            clearOutput(); // Clear previous output
+
+            const zipUrlInput = document.getElementById('zipUrlInput');
+            const outputDiv = document.getElementById('output');
+
+            const url = zipUrlInput.value;
+            if (!url) {
+                alert('Please enter a URL.');
+                return;
+            }
+
+            fetch(url)
+                .then(response => response.arrayBuffer())
+                .then(arrayBuffer => JSZip.loadAsync(arrayBuffer))
+                .then(function(zip) {
+                    outputDiv.innerHTML = '<h3>Files:</h3>';
+                    Object.keys(zip.files).forEach(function(filename) {
+                        zip.files[filename].async('blob').then(function(content) {
+                            const fileItem = document.createElement('div');
+                            fileItem.className = 'file-item';
+
+                            const fileNameSpan = document.createElement('span');
+                            fileNameSpan.textContent = filename;
+
+                            const downloadButton = document.createElement('button');
+                            downloadButton.textContent = 'Download';
+                            downloadButton.onclick = function() {
+                                const blobURL = URL.createObjectURL(content);
+                                const a = document.createElement('a');
+                                a.href = blobURL;
+                                a.download = filename;
+                                a.click();
+                                URL.revokeObjectURL(blobURL); // Release the memory
+                            };
+
+                            fileItem.appendChild(fileNameSpan);
+                            fileItem.appendChild(downloadButton);
+                            outputDiv.appendChild(fileItem);
+                        });
+                    });
+                })
+                .catch(function(err) {
+                    console.error('Error fetching or reading ZIP file:', err);
+                });
+        }
+    </script>
+</body>
+</html>
