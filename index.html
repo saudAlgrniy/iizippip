@@ -6,52 +6,51 @@
     <title>Unzip and Download Files</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
 
+		
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
-				html, body {
-    height: 100%;
-    width: 100%;
-    margin: 0;
-    overflow: hidden; /* Disable scrolling */
-    touch-action: none; /* Prevent zooming on touch devices */
-    position: relative;
-    background: linear-gradient(135deg, #89fffd, #ef32d9); /* Background gradient */
-    color: #fff; /* Text color */
-}
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            overflow: hidden;
+            touch-action: none;
+            position: relative;
+            background: linear-gradient(135deg, #89fffd, #ef32d9);
+            color: #fff;
+        }
 
-body {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    height: 100vh;
-    width: 100vw;
-    font-family: 'Poppins', sans-serif;
-    overflow: hidden;
-    position: fixed; /* Fix position to prevent scrolling */
-}
+        body { 
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            width: 100vw;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            position: fixed;
+        }
 
-.container {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    backdrop-filter: blur(10px);
-    padding: 25px;
-    width: 97%;
-    max-width: 2000px;
-    max-height: 80vh;
-    overflow-y: auto;
-    text-align: center;
-    animation: fadeIn 1s ease-in-out;
-    margin-top: 6%;
-    position: relative;
-}
-
+        .container {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 5px;
+            width: 97%;
+            max-width: 2000px;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+            margin-top: 6%;
+            position: relative;
+        }
 
         h1 {
             font-size: 2rem;
@@ -85,7 +84,7 @@ body {
         .input-container {
             --c-text: rgb(50, 50, 80);
             --c-bg: rgb(252, 252, 252);
-            --c-outline: rgb(55, 45 , 190);
+            --c-outline: rgb(55, 45, 190);
             display: grid;
             gap: 1ch;
             position: relative;
@@ -230,150 +229,507 @@ body {
         .hidden {
             display: none;
         }
+
+
+        .modal {
+            display: none; /* خفي بشكل افتراضي */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            text-align: left;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+		.close-btn {
+    cursor: pointer;
+    background-color: #ff4d4d; /* لون خلفية أحمر فاتح */
+    color: white;
+    border: none;
+    padding: 10px 15px; /* زيادة حجم الحشوة */
+    border-radius: 5px;
+    font-size: 20px; /* تكبير حجم النص */
+    font-weight: bold; /* جعل النص عريض */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* تأثير سلس لتغيير اللون والحركة */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* ظل خفيف لإضافة عمق */
+    margin-top: -10px;
+    padding-top: 10px;
+
+}
+
+.close-btn:hover {
+    background-color: #ff1a1a; /* لون مختلف عند التمرير */
+    transform: scale(1.05); /* تكبير بسيط عند التمرير */
+}
+
+.close-btn:active {
+    background-color: #cc0000; /* لون عند النقر */
+    transform: scale(0.95); /* تصغير بسيط عند النقر */
+}
+
+	
+	.flex-container {
+    display: flex;
+    align-items: center; /* محاذاة عمودية في المنتصف */
+}
+
+.save-btn {
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin-left: -1px; /* مسافة بين الزر وselect */
+    margin-top: -15px;
+    border-radius: 1px;
+}
+
+#formatSelect {
+    width: 200px; /* عرض العنصر */
+    padding: 10px; /* حشوة داخلية */
+    border: 1px solid #ccc; /* حد */
+    border-radius: 1px; /* زوايا مدورة */
+    background-color: #fffafa; /* لون الخلفية */
+    font-size: 20px; /* حجم الخط */
+    color: #000000; /* لون الخط */
+	margin-left: 30px;
+	margin-top: -15px;
+    height: 33px;
+    outline: none;
+}
+
+#formatSelect:hover {
+    border-color: #888; /* تغيير لون الحد عند التمرير */
+}
+
+#subtitleContent {
+    width: 110%; /* عرض الحقل ليكون بعرض الحاوية */
+    height: 300px; /* ارتفاع الحقل، يمكنك تعديله حسب الحاجة */
+    padding: 10px; /* حشوة داخلية لجعل النص أكثر راحة للقراءة */
+    font-size: 16px; /* حجم الخط داخل الحقل */
+    border: 1px solid #ccc; /* حد خارجي للحقل */
+    border-radius: 5px; /* زوايا مدورة */
+    resize: vertical; /* السماح بتغيير الحجم عموديًا فقط */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* ظل خفيف لإضافة عمق */
+    background-color: #f9f9f9;
+}
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>[ZIP] فـك الـضـغـط</h1>
-        <div class="tab-buttons">
-            <button id="urlTab" class="active">URL</button>
-            <button id="fileTab">File</button>
-        </div>
 
-        <div id="urlSection">
-            <div class="input-container">
-                <input type="text" id="zipUrlInput" placeholder="Enter ZIP file URL" class="input-field" />
-                <label class="input-label" for="zipUrlInput">URL</label>
-            </div>
-            <button onclick="unzipFromUrl()">فـك الـضـغـط</button>
-        </div>
-
-        <div id="fileSection" class="hidden">
-            <input type="file" id="zipFileInput" accept=".zip" class="file-input"/>
-            <button onclick="unzipFile()">فـك الـضـغـط</button>
-        </div>
-
-        <div id="output"></div>
+	<div class="container">
+    <h1>[ZIP] فـك الـضـغـط</h1>
+    <div class="tab-buttons">
+        <button id="urlTab" class="active">URL</button>
+        <button id="fileTab">File</button>
     </div>
 
-    <script>
-        function clearOutput() {
-            document.getElementById('output').innerHTML = '';
-        }
+    <div id="urlSection">
+        <div class="input-container">
+            <input type="text" id="zipUrlInput" placeholder="Enter ZIP file URL" class="input-field" />
+            <label class="input-label" for="zipUrlInput">URL</label>
+        </div>
+        <button onclick="unzipFromUrl()">فـك الـضـغـط</button>
+    </div>
 
-        document.getElementById('urlTab').addEventListener('click', function() {
-            clearOutput(); // Clear output when switching to URL tab
-            document.getElementById('urlSection').classList.remove('hidden');
-            document.getElementById('fileSection').classList.add('hidden');
-            this.classList.add('active');
-            document.getElementById('fileTab').classList.remove('active');
-        });
+    <div id="fileSection" class="hidden">
+        <input type="file" id="zipFileInput" accept=".zip" class="file-input" />
+        <button onclick="unzipFile()">فـك الـضـغـط</button>
+    </div>
 
-        document.getElementById('fileTab').addEventListener('click', function() {
-            clearOutput(); // Clear output when switching to File tab
-            document.getElementById('fileSection').classList.remove('hidden');
-            document.getElementById('urlSection').classList.add('hidden');
-            this.classList.add('active');
-            document.getElementById('urlTab').classList.remove('active');
-        });
+    <div id="output"></div>
+</div>
 
-        function unzipFile() {
-            clearOutput(); // Clear previous output
+<!-- قائمة منبثقة لتعديل النص -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>تعديل الترجمة</h2>
+            <button class="close-btn" onclick="closeModal()">X</button>
+        </div>
+        <label for="subtitleContent">محتوى الترجمة:</label>
+        <textarea id="subtitleContent" rows="10" style="width: 100%;"></textarea>
+        
+        <label for="formatSelect">اختر صيغة الحفظ:</label>
+        <div class="flex-container">
+            <select id="formatSelect">
+                <option value="srt">SRT</option>
+                <option value="ass">ASS</option>
+                <option value="sub">SUB</option>
+            </select>
+            <button class="save-btn" onclick="saveChanges()">حفظ</button>
+        </div>
+                <label for="fontColor">اختر لون الخط:</label>
+        <input type="color" id="fontColor" value="#000000" />
 
-            const zipFileInput = document.getElementById('zipFileInput');
-            const outputDiv = document.getElementById('output');
+    </div>
+</div>
 
-            if (zipFileInput.files.length === 0) {
-                alert('Please select a ZIP file.');
-                return;
-            }
+<script>
 
-            const file = zipFileInput.files[0];
-            const reader = new FileReader();
+let currentSrtContent = '';
+let originalFilename = ''; // تخزين اسم الملف الأصلي
 
-            reader.onload = function(e) {
-                JSZip.loadAsync(e.target.result)
-                    .then(function(zip) {
-                        outputDiv.innerHTML = '<h3>Files:</h3>';
-                        Object.keys(zip.files).forEach(function(filename) {
-                            zip.files[filename].async('blob').then(function(content) {
-                                const fileItem = document.createElement('div');
-                                fileItem.className = 'file-item';
+function clearOutput() {
+    document.getElementById('output').innerHTML = '';
+}
 
-                                const fileNameSpan = document.createElement('span');
-                                fileNameSpan.textContent = filename;
+document.getElementById('urlTab').addEventListener('click', function() {
+    clearOutput();
+    document.getElementById('urlSection').classList.remove('hidden');
+    document.getElementById('fileSection').classList.add('hidden');
+    this.classList.add('active');
+    document.getElementById('fileTab').classList.remove('active');
+});
 
-                                const downloadButton = document.createElement('button');
-                                downloadButton.textContent = 'Download';
-                                downloadButton.onclick = function() {
-                                    const blobURL = URL.createObjectURL(content);
-                                    const a = document.createElement('a');
-                                    a.href = blobURL;
-                                    a.download = filename;
-                                    a.click();
-                                    URL.revokeObjectURL(blobURL); // Release the memory
-                                };
+document.getElementById('fileTab').addEventListener('click', function() {
+    clearOutput();
+    document.getElementById('fileSection').classList.remove('hidden');
+    document.getElementById('urlSection').classList.add('hidden');
+    this.classList.add('active');
+    document.getElementById('urlTab').classList.remove('active');
+});
 
-                                fileItem.appendChild(fileNameSpan);
-                                fileItem.appendChild(downloadButton);
-                                outputDiv.appendChild(fileItem);
-                            });
-                        });
-                    })
-                    .catch(function(err) {
-                        console.error('Error reading ZIP file:', err);
+function unzipFile() {
+    clearOutput();
+
+    const zipFileInput = document.getElementById('zipFileInput');
+    const outputDiv = document.getElementById('output');
+
+    if (zipFileInput.files.length === 0) {
+        alert('Please select a ZIP file.');
+        return;
+    }
+
+    const file = zipFileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        JSZip.loadAsync(e.target.result)
+            .then(function(zip) {
+                outputDiv.innerHTML = '<h3>Files :</h3>';
+                Object.keys(zip.files).forEach(function(filename) {
+                    zip.files[filename].async('blob').then(function(content) {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'file-item';
+
+                        const fileNameSpan = document.createElement('span');
+                        fileNameSpan.textContent = filename;
+
+                        const downloadButton = document.createElement('button');
+                        downloadButton.textContent = 'Download';
+                        downloadButton.onclick = function() {
+                            const blobURL = URL.createObjectURL(content);
+                            const a = document.createElement('a');
+                            a.href = blobURL;
+                            a.download = filename;
+                            a.click();
+                            URL.revokeObjectURL(blobURL);
+                        };
+
+                        const editButton = document.createElement('button');
+                        editButton.textContent = 'تعديل';
+                        editButton.onclick = function() {
+                            if (filename.endsWith('.srt')) {
+                                content.arrayBuffer().then(buffer => {
+                                    const utf8Decoder = new TextDecoder('utf-8', { fatal: true });
+                                    let decodedText;
+                                    try {
+                                        decodedText = utf8Decoder.decode(buffer);
+                                        if (!isContentReadable(decodedText)) {
+                                            throw new Error("غير قابل للقراءة");
+                                        }
+                                    } catch {
+                                        const windows1256Decoder = new TextDecoder('windows-1256');
+                                        decodedText = windows1256Decoder.decode(buffer);
+                                    }
+                                    currentSrtContent = decodedText;
+                                    originalFilename = filename; // حفظ اسم الملف الأصلي
+                                    document.getElementById('subtitleContent').value = currentSrtContent;
+                                    document.getElementById('editModal').style.display = 'flex';
+                                    updateSubtitleContent();
+                                });
+                            } else {
+                                alert('يمكن تعديل ملفات SRT فقط.');
+                            }
+                        };
+
+                        fileItem.appendChild(fileNameSpan);
+                        fileItem.appendChild(downloadButton);
+                        fileItem.appendChild(editButton);
+                        outputDiv.appendChild(fileItem);
                     });
-            };
-
-            reader.readAsArrayBuffer(file);
-        }
-
-        function unzipFromUrl() {
-            clearOutput(); // Clear previous output
-
-            const zipUrlInput = document.getElementById('zipUrlInput');
-            const outputDiv = document.getElementById('output');
-
-            const url = zipUrlInput.value;
-            if (!url) {
-                alert('Please enter a URL.');
-                return;
-            }
-
-            fetch(url)
-                .then(response => response.arrayBuffer())
-                .then(arrayBuffer => JSZip.loadAsync(arrayBuffer))
-                .then(function(zip) {
-                    outputDiv.innerHTML = '<h3>Files:</h3>';
-                    Object.keys(zip.files).forEach(function(filename) {
-                        zip.files[filename].async('blob').then(function(content) {
-                            const fileItem = document.createElement('div');
-                            fileItem.className = 'file-item';
-
-                            const fileNameSpan = document.createElement('span');
-                            fileNameSpan.textContent = filename;
-
-                            const downloadButton = document.createElement('button');
-                            downloadButton.textContent = 'Download';
-                            downloadButton.onclick = function() {
-                                const blobURL = URL.createObjectURL(content);
-                                const a = document.createElement('a');
-                                a.href = blobURL;
-                                a.download = filename;
-                                a.click();
-                                URL.revokeObjectURL(blobURL); // Release the memory
-                            };
-
-                            fileItem.appendChild(fileNameSpan);
-                            fileItem.appendChild(downloadButton);
-                            outputDiv.appendChild(fileItem);
-                        });
-                    });
-                })
-                .catch(function(err) {
-                    console.error('Error fetching or reading ZIP file:', err);
                 });
+            })
+            .catch(function(err) {
+                console.error('Error reading ZIP file:', err);
+            });
+    };
+
+    reader.readAsArrayBuffer(file);
+}
+
+async function unzipFromUrl() {
+    clearOutput();
+    
+    const zipUrl = document.getElementById('zipUrlInput').value;
+    if (!zipUrl) {
+        alert('Please enter a ZIP file URL.');
+        return;
+    }
+
+    try {
+        const response = await fetch(zipUrl);
+        if (!response.ok) {
+            throw new Error('Failed to fetch the ZIP file.');
         }
-    </script>
+        const blob = await response.blob();
+        const arrayBuffer = await blob.arrayBuffer();
+
+        JSZip.loadAsync(arrayBuffer)
+            .then(function(zip) {
+                document.getElementById('output').innerHTML = '<h3>Files :</h3>';
+                Object.keys(zip.files).forEach(function(filename) {
+                    zip.files[filename].async('blob').then(function(content) {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'file-item';
+
+                        const fileNameSpan = document.createElement('span');
+                        fileNameSpan.textContent = filename;
+
+                        const downloadButton = document.createElement('button');
+                        downloadButton.textContent = 'Download';
+                        downloadButton.onclick = function() {
+                            const blobURL = URL.createObjectURL(content);
+                            const a = document.createElement('a');
+                            a.href = blobURL;
+                            a.download = filename;
+                            a.click();
+                            URL.revokeObjectURL(blobURL);
+                        };
+
+                        const editButton = document.createElement('button');
+                        editButton.textContent = 'تعديل';
+                        editButton.onclick = function() {
+                            if (filename.endsWith('.srt')) {
+                                content.arrayBuffer().then(buffer => {
+                                    const utf8Decoder = new TextDecoder('utf-8', { fatal: true });
+                                    let decodedText;
+                                    try {
+                                        decodedText = utf8Decoder.decode(buffer);
+                                        if (!isContentReadable(decodedText)) {
+                                            throw new Error("غير قابل للقراءة");
+                                        }
+                                    } catch {
+                                        const windows1256Decoder = new TextDecoder('windows-1256');
+                                        decodedText = windows1256Decoder.decode(buffer);
+                                    }
+                                    currentSrtContent = decodedText;
+                                    originalFilename = filename; // حفظ اسم الملف الأصلي
+                                    document.getElementById('subtitleContent').value = currentSrtContent;
+                                    document.getElementById('editModal').style.display = 'flex';
+                                    updateSubtitleContent();
+                                });
+                            } else {
+                                alert('يمكن تعديل ملفات SRT فقط.');
+                            }
+                        };
+
+                        fileItem.appendChild(fileNameSpan);
+                        fileItem.appendChild(downloadButton);
+                        fileItem.appendChild(editButton);
+                        document.getElementById('output').appendChild(fileItem);
+                    });
+                });
+            })
+            .catch(function(err) {
+                console.error('Error reading ZIP file from URL:', err);
+            });
+    } catch (error) {
+        console.error('Error fetching ZIP file:', error);
+        alert('Failed to fetch ZIP file from the URL.');
+    }
+}
+
+function saveChanges() {
+    const selectedFormat = document.getElementById('formatSelect').value;
+    let convertedContent;
+
+    if (selectedFormat === 'ass') {
+        convertedContent = convertSrtToAss(currentSrtContent);
+    } else if (selectedFormat === 'sub') {
+        convertedContent = convertSrtToSub(currentSrtContent);
+    } else {
+        convertedContent = document.getElementById('subtitleContent').value;
+    }
+
+    const blob = new Blob([convertedContent], { type: 'text/plain;charset=UTF-8' });
+    const url = URL.createObjectURL(blob);
+
+    const downloadLink = document.createElement('a');
+    // تنزيل الملف المعدل باسم الملف الأصلي مع التمديد الجديد
+    downloadLink.href = url;
+    downloadLink.download = originalFilename.replace('.srt', `.${selectedFormat}`);
+    downloadLink.click();
+
+    URL.revokeObjectURL(url);
+    closeModal();
+}
+
+function closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+
+function updateSubtitleContent() {
+    const selectedFormat = document.getElementById('formatSelect').value;
+    const fontColor = document.getElementById('fontColor').value;
+    let updatedContent;
+
+    if (selectedFormat === 'ass') {
+        updatedContent = convertSrtToAss(currentSrtContent);
+    } else if (selectedFormat === 'sub') {
+        updatedContent = convertSrtToSub(currentSrtContent);
+    } else {
+        updatedContent = currentSrtContent;
+    }
+
+    const srtLines = updatedContent.split('\n');
+    let finalContent = '';
+
+    for (let i = 0; i < srtLines.length; i++) {
+        const line = srtLines[i].trim();
+
+        if (line.match(/^\d+$/) || line.match(/^\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}$/)) {
+            finalContent += line + '\n';
+        } else if (line === '') {
+            finalContent += '\n';
+        } else {
+            if (selectedFormat === 'srt') {
+                finalContent += `<font color="${fontColor}">${line}</font>\n`;
+            } else {
+                finalContent += line + '\n';
+            }
+        }
+    }
+
+    document.getElementById('subtitleContent').value = finalContent.trim();
+}
+
+document.getElementById('formatSelect').addEventListener('change', updateSubtitleContent);
+document.getElementById('fontColor').addEventListener('input', updateSubtitleContent); // تحديث الحقل مباشرة عند اختيار اللون
+
+function isContentReadable(text) {
+    return /[\u0600-\u06FF]/.test(text);
+}
+
+function convertSrtToAss(srt) {
+    let assContent = '';
+    const srtLines = srt.split('\n');
+    let i = 0;
+
+    const header = `[Script Info]
+Title: Converted Subtitle
+ScriptType: v4.00+
+Collisions: Normal
+PlayDepth: 0
+Timer: 100.0000
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Default,Arial,20,&Hffffff&,&H000000&,&H000000&,&H000000&,0,0,0,0,100,100,0,0,1,2,1,1,10,10,10,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+`;
+
+    assContent += header;
+
+    while (i < srtLines.length) {
+        if (srtLines[i].match(/^\d+$/)) {
+            i++;
+            continue;
+        }
+
+        const timeMatch = srtLines[i].match(/(\d{2}):(\d{2}):(\d{2}),(\d{3}) --> (\d{2}):(\d{2}):(\d{2}),(\d{3})/);
+        if (timeMatch) {
+            const startTime = `${timeMatch[1]}:${timeMatch[2]}:${timeMatch[3]}.${Math.floor(timeMatch[4] / 10)}`;
+            const endTime = `${timeMatch[5]}:${timeMatch[6]}:${timeMatch[7]}.${Math.floor(timeMatch[8] / 10)}`;
+
+            i++;
+            let text = '';
+            while (srtLines[i] && srtLines[i].trim() !== '') {
+                text += srtLines[i].trim() + '\\N';
+                i++;
+            }
+
+            text = text.slice(0, -2);
+
+            assContent += `Dialogue: 0,${startTime},${endTime},Default,,0,0,0,,${text}\n`;
+        }
+        i++;
+    }
+
+    return assContent;
+}
+
+function convertSrtToSub(srtContent) {
+    const fps = 23.976; // يمكنك تعديل الـ FPS بناءً على الفيديو
+    const lines = srtContent.split('\n');
+    let convertedContent = '';
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+
+        if (line === '') {
+            continue;
+        }
+
+        if (!isNaN(line)) {
+            continue;
+        }
+
+        if (line.includes('-->')) {
+            const timeParts = line.split(' --> ');
+            const startTime = convertSrtTimeToSubFormat(timeParts[0], fps) + 1;
+            const endTime = convertSrtTimeToSubFormat(timeParts[1], fps) + 1;
+            convertedContent += `{${startTime}}{${endTime}}\n`;
+        } else {
+            convertedContent += `${line}\n`;
+        }
+    }
+
+    return convertedContent;
+}
+
+function convertSrtTimeToSubFormat(srtTime, fps) {
+    const [hours, minutes, rest] = srtTime.split(':');
+    const [seconds, milliseconds] = rest.split(',');
+    const totalSeconds = parseInt(hours) * 3600 + parseInt(minutes) * 60 + parseInt(seconds) + parseInt(milliseconds) / 1000;
+    return Math.floor(totalSeconds * fps);
+}
+
+</script>
+
+
 </body>
 </html>
