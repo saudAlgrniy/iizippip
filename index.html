@@ -1,14 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
+<!doctype html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Unzip and Download Files</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <style>
 
-		
-        * {
+	<style> 
+    
+     * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
@@ -333,59 +334,111 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* ظل خفيف لإضافة عمق */
     background-color: #f9f9f9;
 }
+
+/* تنسيق حقل اختيار لون الخط */
+#fontColor {
+    width: 95px; /* عرض ثابت لحقل اللون */
+    height: 30px; /* ارتفاع ثابت لحقل اللون */
+    border: 3px solid transparent; /* حدود شفافة مع سمك أقل */
+    border-radius: 5px; /* زوايا دائرية */
+    cursor: pointer; /* مؤشر يد عند التحويم */
+    outline: none; /* إزالة الحدود عند التركيز */
+    transition: border-color 0.3s ease; /* تأثير انتقال سلس عند تغيير الحدود */
+    appearance: none; /* إزالة التنسيق الافتراضي */
+    background-color: #fff; /* خلفية بيضاء */
+    margin-left: auto; /* دفعه إلى اليمين */
+    display: block; /* تأكد من أنه عنصر كتلة */
+    position: relative; /* ضبط موضع النسبي */
+    top: -25px; /* تحريكه لأعلى بمقدار 25 بكسل */
+    animation: borderAnimation 3s linear infinite; /* إضافة الرسوم المتحركة */
+}
+
+/* إضافة نص "اختر لون الخط" قبل حقل اللون */
+#fontColor::before {
+    content: "Font Color"; /* النص المطلوب */
+    font-weight: bold; /* جعل النص ثقيل */
+    color: #333; /* لون النص */
+    margin-bottom: 5px; /* مسافة سفلية */
+    display: block; /* جعلها كتلة لتكون في سطر منفصل */
+    position: absolute; /* ضبط الموضع المطلق */
+    top: -25px; /* موضعه فوق حقل اللون */
+    left: 3px; /* محاذاة لليسار */
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+/* تعريف الرسوم المتحركة للحدود */
+@keyframes borderAnimation {
+    0% {
+        border-color: red;
+        box-shadow: 0 0 0 0 red;
+    }
+    25% {
+        box-shadow: 0 0 0 3px orange; /* تعديل سمك الظل هنا */
+    }
+    50% {
+        box-shadow: 0 0 0 3px yellow; /* تعديل سمك الظل هنا */
+    }
+    75% {
+        box-shadow: 0 0 0 3px green; /* تعديل سمك الظل هنا */
+    }
+    100% {
+        box-shadow: 0 0 0 3px blue; /* تعديل سمك الظل هنا */
+    }
+}
     </style>
-</head>
-<body>
+  </head>
+	<body>
 
-	<div class="container">
-    <h1>[ZIP] فـك الـضـغـط</h1>
-    <div class="tab-buttons">
-        <button id="urlTab" class="active">URL</button>
-        <button id="fileTab">File</button>
-    </div>
-
-    <div id="urlSection">
-        <div class="input-container">
-            <input type="text" id="zipUrlInput" placeholder="Enter ZIP file URL" class="input-field" />
-            <label class="input-label" for="zipUrlInput">URL</label>
+    <div class="container">
+        <h1>[ZIP] فـك الـضـغـط</h1>
+        <div class="tab-buttons">
+            <button id="urlTab" class="active">URL</button>
+            <button id="fileTab">File</button>
         </div>
-        <button onclick="unzipFromUrl()">فـك الـضـغـط</button>
-    </div>
 
-    <div id="fileSection" class="hidden">
-        <input type="file" id="zipFileInput" accept=".zip" class="file-input" />
-        <button onclick="unzipFile()">فـك الـضـغـط</button>
-    </div>
-
-    <div id="output"></div>
-</div>
-
-<!-- قائمة منبثقة لتعديل النص -->
-<div class="modal" id="editModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>تعديل الترجمة</h2>
-            <button class="close-btn" onclick="closeModal()">X</button>
+        <div id="urlSection">
+            <div class="input-container">
+                <input type="text" id="zipUrlInput" placeholder="Enter ZIP file URL" class="input-field" />
+                <label class="input-label" for="zipUrlInput">URL</label>
+            </div>
+            <button onclick="unzipFromUrl()">فـك الـضـغـط</button>
         </div>
-        <label for="subtitleContent">محتوى الترجمة:</label>
-        <textarea id="subtitleContent" rows="10" style="width: 100%;"></textarea>
-        
-        <label for="formatSelect">اختر صيغة الحفظ:</label>
-        <div class="flex-container">
-            <select id="formatSelect">
-                <option value="srt">SRT</option>
-                <option value="ass">ASS</option>
-                <option value="sub">SUB</option>
-            </select>
-            <button class="save-btn" onclick="saveChanges()">حفظ</button>
+
+        <div id="fileSection" class="hidden">
+            <input type="file" id="zipFileInput" accept=".zip" class="file-input" />
+            <button onclick="unzipFile()">فـك الـضـغـط</button>
         </div>
-                <label for="fontColor">اختر لون الخط:</label>
-        <input type="color" id="fontColor" value="#000000" />
 
+        <div id="output"></div>
     </div>
-</div>
 
-<script>
+    <!-- قائمة منبثقة لتعديل النص -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>تعديل الترجمة</h2>
+                <button class="close-btn" onclick="closeModal()">X</button>
+            </div>
+            <label for="subtitleContent">محتوى الترجمة:</label>
+            <textarea id="subtitleContent" rows="10" style="width: 100%;"></textarea>
+            
+            <label for="formatSelect">اختر صيغة الحفظ:</label>
+            <div class="flex-container">
+                <select id="formatSelect">
+                    <option value="srt">SRT</option>
+                    <option value="ass">ASS</option>
+                    <option value="sub">SUB</option>
+                    <option value="webvtt">WebVTT</option> <!-- الخيار الجديد -->
+                </select>
+                <button class="save-btn" onclick="saveChanges()">حفظ</button>
+            </div>
+            <input type="color" id="fontColor" value="#000000" />
+        </div>
+    </div>
+
+
+	<script>
 
 let currentSrtContent = '';
 let originalFilename = ''; // تخزين اسم الملف الأصلي
@@ -571,25 +624,12 @@ async function unzipFromUrl() {
     }
 }
 
-function saveChanges() {
-    const selectedFormat = document.getElementById('formatSelect').value;
-    let convertedContent;
 
-    if (selectedFormat === 'ass') {
-        convertedContent = convertSrtToAss(currentSrtContent);
-    } else if (selectedFormat === 'sub') {
-        convertedContent = convertSrtToSub(currentSrtContent);
-    } else {
-        convertedContent = document.getElementById('subtitleContent').value;
-    }
 
-    const blob = new Blob([convertedContent], { type: 'text/plain;charset=UTF-8' });
-    const url = URL.createObjectURL(blob);
 
     const downloadLink = document.createElement('a');
-    // تنزيل الملف المعدل باسم الملف الأصلي مع التمديد الجديد
     downloadLink.href = url;
-    downloadLink.download = originalFilename.replace('.srt', `.${selectedFormat}`);
+    downloadLink.download = `${downloadFileName}${fileExtension}`; // استخدام الاسم المعدل مع الامتداد الجديد
     downloadLink.click();
 
     URL.revokeObjectURL(url);
@@ -609,6 +649,8 @@ function updateSubtitleContent() {
         updatedContent = convertSrtToAss(currentSrtContent);
     } else if (selectedFormat === 'sub') {
         updatedContent = convertSrtToSub(currentSrtContent);
+    } else if (selectedFormat === 'webvtt') {
+        updatedContent = convertSrtToVtt(currentSrtContent); // تحديث إلى WebVTT
     } else {
         updatedContent = currentSrtContent;
     }
@@ -642,31 +684,72 @@ function isContentReadable(text) {
     return /[\u0600-\u06FF]/.test(text);
 }
 
+
+
+function convertSrtToVtt(srtContent) {
+    const vttHeader = 'WEBVTT\n\n';
+    let vttBody = '';
+    let currentText = '';
+
+    const srtLines = srtContent.split('\n');
+
+    srtLines.forEach((line, index) => {
+        // تطابق توقيت SRT
+        const timeMatch = line.match(/(\d{2}):(\d{2}):(\d{2}),(\d{3}) --> (\d{2}):(\d{2}):(\d{2}),(\d{3})/);
+        
+        if (timeMatch) {
+            // إذا كانت هناك نصوص تم تجميعها من قبل، يتم إضافتها تحت آخر توقيت
+            if (currentText) {
+                vttBody += `${currentText.trim()}\n\n`; // أضف النص مع سطر فارغ
+                currentText = ''; // إعادة ضبط النص الحالي
+            }
+
+            // حساب التوقيت بالثواني باستخدام صيغة WebVTT المطلوبة
+            const startTime = parseFloat(timeMatch[1]) * 3600 + parseFloat(timeMatch[2]) * 60 + parseFloat(timeMatch[3]) + parseFloat(timeMatch[4]) / 1000;
+            const endTime = parseFloat(timeMatch[5]) * 3600 + parseFloat(timeMatch[6]) * 60 + parseFloat(timeMatch[7]) + parseFloat(timeMatch[8]) / 1000;
+
+            // إضافة التوقيت بتنسيق vttcue
+            vttBody += `vttcue(${startTime.toFixed(3)}, ${endTime.toFixed(3)})\n`;
+        } else if (line.trim() !== '' && !/^\d+$/.test(line.trim())) { // شرط لإزالة الأرقام في سطر لوحده
+            // تجميع النصوص الحالية
+            currentText += line.trim() + ' ';
+        }
+    });
+
+    // إضافة آخر نص في حال وجوده
+    if (currentText) {
+        vttBody += `"${currentText.trim()}"\n\n`;
+    }
+
+    return vttHeader + vttBody.trim(); // إضافة رأس WebVTT مع الجسم
+}
+
+
 function convertSrtToAss(srt) {
     let assContent = '';
     const srtLines = srt.split('\n');
     let i = 0;
 
     const header = `[Script Info]
-; Script generated by Aegisub 3.2.2
-; http://www.aegisub.org/
-Title: Default Aegisub file
-ScriptType: v4.00+
-WrapStyle: 0
-ScaledBorderAndShadow: yes
-YCbCr Matrix: None
+	; Script generated by Aegisub 3.2.2
+	; http://www.aegisub.org/
+	Title: Default Aegisub file
+	ScriptType: v4.00+
+	WrapStyle: 0
+	ScaledBorderAndShadow: yes
+	YCbCr Matrix: None
 
-[Aegisub Project Garbage]
-Last Style Storage: Default
+	[Aegisub Project Garbage]
+	Last Style Storage: Default
 
-[V4+ Styles]
-Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+	[V4+ Styles]
+	Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 
-Style: Default,Arial,30,&H00FFFFFF,&H000000FF,&H80000000,&H80000000,-1,0,0,0,100,100,0,0,4,0,0,2,10,10,10,1
+	Style: Default,Arial,30,&H00FFFFFF,&H000000FF,&H80000000,&H80000000,-1,0,0,0,100,100,0,0,4,0,0,2,10,10,10,1
 
-[Events]
-Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
-`;
+	[Events]
+	Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+	`;
 
     assContent += header;
 
@@ -697,6 +780,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
     return assContent;
 }
+
 
 function convertSrtToSub(srtContent) {
     const fps = 23.976; // يمكنك تعديل الـ FPS بناءً على الفيديو
@@ -735,6 +819,7 @@ function convertSrtTimeToSubFormat(srtTime, fps) {
 }
 
 </script>
+
 
 
 </body>
