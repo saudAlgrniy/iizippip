@@ -1,15 +1,14 @@
 <!doctype html>
 <html>
   <head>
-    <title>Title</title>
+    <title>ii-ZIP</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-	  <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Unzip and Download Files</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/7817/7817526.png" type="image/png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/7817/7817526.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<link rel="icon" href="https://cdn-icons-png.flaticon.com/512/7817/7817526.png" type="image/png">
-<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/7817/7817526.png">
 	<style> 
     
      * {
@@ -27,6 +26,9 @@
             position: relative;
             background: linear-gradient(135deg, #89fffd, #ef32d9);
             color: #fff;
+			
+
+
         }
 
         body { 
@@ -38,6 +40,7 @@
             font-family: 'Poppins', sans-serif;
             overflow: hidden;
             position: fixed;
+            
         }
 
         .container {
@@ -301,24 +304,24 @@
     background-color: green;
     color: white;
     border: none;
-    padding: 5px 10px;
+    padding: 8px 25px;
     border-radius: 5px;
     margin-left: -1px; /* مسافة بين الزر وselect */
-    margin-top: -15px;
+    margin-top: -5px;
     border-radius: 1px;
 }
 
 #formatSelect {
-    width: 200px; /* عرض العنصر */
+    width: 230px; /* عرض العنصر */
     padding: 10px; /* حشوة داخلية */
     border: 1px solid #ccc; /* حد */
     border-radius: 1px; /* زوايا مدورة */
     background-color: #fffafa; /* لون الخلفية */
     font-size: 20px; /* حجم الخط */
     color: #000000; /* لون الخط */
-	margin-left: 30px;
-	margin-top: -15px;
-    height: 33px;
+	margin-left: 14px;
+	margin-top: -5px;
+    height: 40px;
     outline: none;
 }
 
@@ -354,6 +357,9 @@
     position: relative; /* ضبط موضع النسبي */
     top: -25px; /* تحريكه لأعلى بمقدار 25 بكسل */
     animation: borderAnimation 3s linear infinite; /* إضافة الرسوم المتحركة */
+    transform: translateY(-380px);
+    margin-left: -0px;
+
 }
 
 /* إضافة نص "اختر لون الخط" قبل حقل اللون */
@@ -388,6 +394,13 @@
     100% {
         box-shadow: 0 0 0 3px blue; /* تعديل سمك الظل هنا */
     }
+}
+
+
+.subtitleContent{
+
+max-height: 800px;
+
 }
     </style>
   </head>
@@ -424,8 +437,7 @@
                 <button class="close-btn" onclick="closeModal()">X</button>
             </div>
             <label for="subtitleContent">محتوى الترجمة:</label>
-            <textarea id="subtitleContent" rows="10" style="width: 100%;"></textarea>
-            
+			<textarea id="subtitleContent" style="width: 100%;"></textarea>            
             <label for="formatSelect">اختر صيغة الحفظ:</label>
             <div class="flex-container">
                 <select id="formatSelect">
@@ -627,8 +639,50 @@ async function unzipFromUrl() {
     }
 }
 
+function saveChanges() {
+    const selectedFormat = document.getElementById('formatSelect').value;
+    let convertedContent;
 
+    // تحويل المحتوى بناءً على الصيغة المحددة
+    if (selectedFormat === 'ass') {
+        convertedContent = convertSrtToAss(currentSrtContent);
+    } else if (selectedFormat === 'sub') {
+        convertedContent = convertSrtToSub(currentSrtContent);
+    } else if (selectedFormat === 'webvtt') {
+        convertedContent = convertSrtToVtt(currentSrtContent);
+    } else if (selectedFormat === 'srt') {
+        // عند اختيار SRT، استخدم المحتوى من حقل الإدخال
+        convertedContent = document.getElementById('subtitleContent').value;
+    } else {
+        convertedContent = currentSrtContent;
+    }
 
+    const blob = new Blob([convertedContent], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+
+    // تعيين الامتداد الصحيح لكل صيغة
+    let fileExtension = '';
+    if (selectedFormat === 'sub') {
+        fileExtension = '.sub';
+    } else if (selectedFormat === 'ass') {
+        fileExtension = '.ass';
+    } else if (selectedFormat === 'webvtt') {
+        fileExtension = '.vtt';
+    } else if (selectedFormat === 'srt') {
+        fileExtension = '.srt'; // صيغة SRT
+    }
+
+    // إزالة أي امتداد سابق من الاسم الأصلي
+    const originalBaseName = originalFilename.replace(/\.[^/.]+$/, '');
+
+    // إضافة [font-{color}] لاسم الملف عند اختيار صيغة SRT
+    let downloadFileName;
+    if (selectedFormat === 'srt') {
+        const fontColor = document.getElementById('fontColor').value; // الحصول على اللون المختار
+        downloadFileName = `[font-${fontColor}] ${originalBaseName}`;
+    } else {
+        downloadFileName = originalBaseName;
+    }
 
     const downloadLink = document.createElement('a');
     downloadLink.href = url;
@@ -638,6 +692,7 @@ async function unzipFromUrl() {
     URL.revokeObjectURL(url);
     closeModal();
 }
+
 
 function closeModal() {
     document.getElementById('editModal').style.display = 'none';
