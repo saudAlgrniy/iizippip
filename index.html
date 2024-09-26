@@ -42,7 +42,11 @@
             font-family: 'Poppins', sans-serif;
             overflow: hidden;
             position: fixed;
-            
+             user-select: none; /* لمنع تحديد النص */
+    -webkit-user-select: none; /* لأجهزة iOS */
+    -moz-user-select: none; /* لمتصفحات Firefox */
+    -ms-user-select: none; /* لمتصفحات Internet Explorer */
+    cursor: default; /* لتغيير شكل المؤشر */
         }
 
         .container {
