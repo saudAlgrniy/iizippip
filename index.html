@@ -402,58 +402,94 @@
 max-height: 800px;
 
 }
+
+.file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    overflow-x: auto; /* إضافة هذا لتمكين التمرير في كامل العنصر */
+}
+
+.file-item span {
+    display: inline-block;
+    white-space: nowrap; /* منع النص من الانتقال إلى سطر جديد */
+    overflow-x: auto; /* السماح بالتمرير الأفقي */
+    max-width: 70%; /* تحديد العرض الأقصى للنص */
+    text-overflow: ellipsis; /* إضافة نقاط (...) للإشارة إلى وجود نص مخفي */
+    -webkit-overflow-scrolling: touch; /* لتفعيل التمرير الناعم على الأجهزة اللمسية */
+}
+
+.file-item button {
+    margin-left: 10px;
+    padding: 5px 10px;
+}
+
+.file-item::-webkit-scrollbar {
+    display: none; /* إخفاء شريط التمرير في متصفح WebKit (Chrome, Safari) */
+}
+
+
     </style>
   </head>
 	<body>
 
-    <div class="container">
-        <h1>[ZIP] فـك الـضـغـط</h1>
-        <div class="tab-buttons">
-            <button id="urlTab" class="active">URL</button>
-            <button id="fileTab">File</button>
-        </div>
-
-        <div id="urlSection">
-            <div class="input-container">
-                <input type="text" id="zipUrlInput" placeholder="Enter ZIP file URL" class="input-field" />
-                <label class="input-label" for="zipUrlInput">URL</label>
-            </div>
-            <button onclick="unzipFromUrl()">فـك الـضـغـط</button>
-        </div>
-
-        <div id="fileSection" class="hidden">
-            <input type="file" id="zipFileInput" accept=".zip" class="file-input" />
-            <button onclick="unzipFile()">فـك الـضـغـط</button>
-        </div>
-
-        <div id="output"></div>
+	<div class="container">
+    <h1>[ZIP] فـك الـضـغـط</h1>
+    <div class="tab-buttons">
+        <button id="urlTab" class="active">URL</button>
+        <button id="fileTab">File</button>
     </div>
 
-    <!-- قائمة منبثقة لتعديل النص -->
-    <div class="modal" id="editModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>تعديل الترجمة</h2>
-                <button class="close-btn" onclick="closeModal()">X</button>
-            </div>
-            <label for="subtitleContent">محتوى الترجمة:</label>
-			<textarea id="subtitleContent" style="width: 100%;"></textarea>            
-            <label for="formatSelect">اختر صيغة الحفظ:</label>
-            <div class="flex-container">
-                <select id="formatSelect">
-                    <option value="srt">SRT</option>
-                    <option value="ass">ASS</option>
-                    <option value="sub">SUB</option>
-                    <option value="webvtt">WebVTT</option> <!-- الخيار الجديد -->
-                </select>
-                <button class="save-btn" onclick="saveChanges()">حفظ</button>
-            </div>
-            <input type="color" id="fontColor" value="#000000" />
+    <div id="urlSection">
+        <div class="input-container">
+            <input type="text" id="zipUrlInput" placeholder="Enter ZIP file URL" class="input-field" />
+            <label class="input-label" for="zipUrlInput">URL</label>
         </div>
+        <button onclick="unzipFromUrl()">فـك الـضـغـط</button>
     </div>
 
+    <div id="fileSection" class="hidden">
+        <input type="file" id="zipFileInput" accept=".zip" class="file-input" />
+        <button onclick="unzipFile()">فـك الـضـغـط</button>
+    </div>
+
+    <!-- ستعرض الملفات هنا -->
+    <div id="output">
+        </div>
+    </div>
+</div>
+
+<!-- قائمة منبثقة لتعديل النص -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>تعديل الترجمة</h2>
+            <button class="close-btn" onclick="closeModal()">X</button>
+        </div>
+        <label for="subtitleContent">محتوى الترجمة:</label>
+        <textarea id="subtitleContent" style="width: 100%;"></textarea>            
+        <label for="formatSelect">اختر صيغة الحفظ:</label>
+        <div class="flex-container">
+            <select id="formatSelect">
+                <option value="srt">SRT</option>
+                <option value="ass">ASS</option>
+                <option value="sub">SUB</option>
+                <option value="webvtt">WebVTT</option> <!-- الخيار الجديد -->
+            </select>
+            <button class="save-btn" onclick="saveChanges()">حفظ</button>
+        </div>
+        <input type="color" id="fontColor" value="#000000" />
+    </div>
+</div>
 
 	<script>
+
+
 
 let currentSrtContent = '';
 let originalFilename = ''; // تخزين اسم الملف الأصلي
