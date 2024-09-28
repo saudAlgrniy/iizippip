@@ -681,6 +681,7 @@ async function unzipFromUrl() {
     }
 }
 
+
 function saveChanges() {
     const selectedFormat = document.getElementById('formatSelect').value;
     let convertedContent;
@@ -693,13 +694,13 @@ function saveChanges() {
     } else if (selectedFormat === 'webvtt') {
         convertedContent = convertSrtToVtt(currentSrtContent);
     } else if (selectedFormat === 'srt') {
-        // عند اختيار SRT، استخدم المحتوى من حقل الإدخال
         convertedContent = document.getElementById('subtitleContent').value;
     } else {
         convertedContent = currentSrtContent;
     }
 
-    const blob = new Blob([convertedContent], { type: 'application/octet-stream' });
+    // التأكد من الترميز UTF-8
+    const blob = new Blob([convertedContent], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
 
     // تعيين الامتداد الصحيح لكل صيغة
@@ -711,16 +712,16 @@ function saveChanges() {
     } else if (selectedFormat === 'webvtt') {
         fileExtension = '.vtt';
     } else if (selectedFormat === 'srt') {
-        fileExtension = '.srt'; // صيغة SRT
+        fileExtension = '.srt';
     }
 
     // إزالة أي امتداد سابق من الاسم الأصلي
-    const originalBaseName = originalFilename.replace(/\.[^/.]+$/, '');
+    const originalBaseName = originalFilename.split('.').slice(0, -1).join('.');
 
     // إضافة [font-{color}] لاسم الملف عند اختيار صيغة SRT
     let downloadFileName;
     if (selectedFormat === 'srt') {
-        const fontColor = document.getElementById('fontColor').value; // الحصول على اللون المختار
+        const fontColor = document.getElementById('fontColor') ? document.getElementById('fontColor').value : 'default';
         downloadFileName = `[font-${fontColor}] ${originalBaseName}`;
     } else {
         downloadFileName = originalBaseName;
@@ -728,7 +729,7 @@ function saveChanges() {
 
     const downloadLink = document.createElement('a');
     downloadLink.href = url;
-    downloadLink.download = `${downloadFileName}${fileExtension}`; // استخدام الاسم المعدل مع الامتداد الجديد
+    downloadLink.download = `${downloadFileName}${fileExtension}`;
     downloadLink.click();
 
     URL.revokeObjectURL(url);
