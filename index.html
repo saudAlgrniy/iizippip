@@ -753,50 +753,88 @@ function updateSubtitleContent() {
         updatedContent = convertSrtToSub(currentSrtContent);
     } else if (selectedFormat === 'webvtt') {
         updatedContent = convertSrtToVtt(currentSrtContent);
-    } else {
+    } else { // إذا كان SRT
         updatedContent = currentSrtContent;
-    }
 
-    const srtLines = updatedContent.split('\n');
-    let finalContent = '';
-    let currentText = '';
+        // معالجة توقيت وترتيب SRT
+        const srtLines = updatedContent.split('\n');
+        let entries = [];
+        let currentText = '';
+        let currentNumber = '';
+        let currentTime = '';
 
-    for (let i = 0; i < srtLines.length; i++) {
-        const line = srtLines[i].trim();
+        for (let i = 0; i < srtLines.length; i++) {
+            const line = srtLines[i].trim();
 
-        // إذا كان السطر عبارة عن رقم فقط أو توقيت، فلا يتم تطبيق اللون
-        if (line.match(/^\d+$/) || line.match(/^\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}$/)) {
-            // إذا كان هناك نص مُجمع، أضف اللون عليه قبل الانتقال للسطر التالي
-            if (currentText) {
-                finalContent += `<font color="${fontColor}">${currentText}</font>\n`;
-                currentText = ''; // إعادة تعيين النص المُجمع
-            }
-            finalContent += line + '\n';
-        } else if (line === '') {
-            // إذا كان السطر فارغ، أضف الفاصل
-            if (currentText) {
-                finalContent += `<font color="${fontColor}">${currentText}</font>\n`;
-                currentText = ''; // إعادة تعيين النص المُجمع
-            }
-            finalContent += '\n';
-        } else {
-            // جمع النصوص في حالة SRT
-            if (selectedFormat === 'srt') {
-                currentText += line + ' '; // جمع النصوص
+            if (line.match(/^\d+$/)) {
+                // إذا كان لدينا نص سابق، نضيفه للإدخال
+                if (currentText) {
+                    entries.push({ number: currentNumber, time: currentTime, text: currentText.trim() });
+                    currentText = ''; // إعادة تعيين النص الحالي
+                }
+                currentNumber = line; // حفظ الرقم الحالي
+            } else if (line.match(/^\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}$/)) {
+                // إذا كان لدينا نص، نضيفه للإدخال
+                if (currentText) {
+                    entries.push({ number: currentNumber, time: currentTime, text: currentText.trim() });
+                    currentText = ''; // إعادة تعيين النص الحالي
+                }
+                currentTime = line; // حفظ التوقيت الحالي
+            } else if (line === '') {
+                // تجاهل الأسطر الفارغة
+                continue;
             } else {
-                finalContent += line + '\n'; // إضافة النصوص كما هي للصيغ الأخرى
+                // إضافة النص
+                if (currentText) {
+                    currentText += '\n' + line; // إضافة فاصل سطر للنص المتعدد
+                } else {
+                    currentText = line; // بدء نص جديد
+                }
             }
         }
+
+        // إضافة النص المتبقي
+        if (currentText) {
+            entries.push({ number: currentNumber, time: currentTime, text: currentText.trim() });
+        }
+
+        // ترتيب الإدخالات حسب التوقيت
+        entries = entries.filter(entry => entry.time).sort((a, b) => {
+            const timeA = a.time.split(' ')[0];
+            const timeB = b.time.split(' ')[0];
+
+            const [hA, mA, sA] = timeA.split(':');
+            const [hB, mB, sB] = timeB.split(':');
+
+            // تحويل إلى مللي ثانية للمقارنة الدقيقة
+            const dateA = new Date(0, 0, 0, hA, mA, sA.replace(',', '.'));
+            const dateB = new Date(0, 0, 0, hB, mB, sB.replace(',', '.'));
+
+            return dateA - dateB;
+        });
+
+        // بناء المحتوى النهائي
+        let finalContent = '';
+        entries.forEach((entry, index) => {
+            finalContent += `${index + 1}\n`; // إضافة الرقم
+            finalContent += `${entry.time}\n`; // إضافة التوقيت
+            if (entry.text) {
+                finalContent += `<font color="${fontColor}">${entry.text}</font>\n`; // إضافة النص مع اللون
+            }
+            finalContent += '\n'; // إضافة خط فارغ بعد كل إدخال
+        });
+
+        // إزالة آخر خط فارغ إذا كان موجوداً
+        finalContent = finalContent.trim();
+
+        updatedContent = finalContent; // تحديث المحتوى النهائي بعد المعالجة
     }
 
-    // إذا كان هناك نص متبقي بعد معالجة جميع الأسطر، أضفه
-    if (currentText) {
-        finalContent += `<font color="${fontColor}">${currentText}</font>\n`;
-    }
-
-    document.getElementById('subtitleContent').value = finalContent.trim();
+    // تعيين المحتوى النهائي في حقل النص
+    document.getElementById('subtitleContent').value = updatedContent.trim();
 }
 
+// إضافة مستمعي الحدث
 document.getElementById('formatSelect').addEventListener('change', updateSubtitleContent);
 document.getElementById('fontColor').addEventListener('input', updateSubtitleContent);
 
