@@ -722,7 +722,7 @@ function saveChanges() {
     let downloadFileName;
     if (selectedFormat === 'srt') {
         const fontColor = document.getElementById('fontColor').value; // الحصول على اللون المختار
-        downloadFileName = `[font-${fontColor}] ${originalBaseName}`;
+        downloadFileName = `[FontColor] ${originalBaseName}`;
     } else {
         downloadFileName = originalBaseName;
     }
