@@ -682,6 +682,59 @@ async function unzipFromUrl() {
 }
 
 
+function saveChanges() {
+    const selectedFormat = document.getElementById('formatSelect').value;
+    let convertedContent;
+
+    // تحويل المحتوى بناءً على الصيغة المحددة
+    if (selectedFormat === 'ass') {
+        convertedContent = convertSrtToAss(currentSrtContent);
+    } else if (selectedFormat === 'sub') {
+        convertedContent = convertSrtToSub(currentSrtContent);
+    } else if (selectedFormat === 'webvtt') {
+        convertedContent = convertSrtToVtt(currentSrtContent);
+    } else if (selectedFormat === 'srt') {
+        // عند اختيار SRT، استخدم المحتوى من حقل الإدخال
+        convertedContent = document.getElementById('subtitleContent').value;
+    } else {
+        convertedContent = currentSrtContent;
+    }
+
+    const blob = new Blob([convertedContent], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+
+    // تعيين الامتداد الصحيح لكل صيغة
+    let fileExtension = '';
+    if (selectedFormat === 'sub') {
+        fileExtension = '.sub';
+    } else if (selectedFormat === 'ass') {
+        fileExtension = '.ass';
+    } else if (selectedFormat === 'webvtt') {
+        fileExtension = '.vtt';
+    } else if (selectedFormat === 'srt') {
+        fileExtension = '.srt'; // صيغة SRT
+    }
+
+    // إزالة أي امتداد سابق من الاسم الأصلي
+    const originalBaseName = originalFilename.replace(/\.[^/.]+$/, '');
+
+    // إضافة [font-{color}] لاسم الملف عند اختيار صيغة SRT
+    let downloadFileName;
+    if (selectedFormat === 'srt') {
+        const fontColor = document.getElementById('fontColor').value; // الحصول على اللون المختار
+        downloadFileName = `[font-${fontColor}] ${originalBaseName}`;
+    } else {
+        downloadFileName = originalBaseName;
+    }
+
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = `${downloadFileName}${fileExtension}`; // استخدام الاسم المعدل مع الامتداد الجديد
+    downloadLink.click();
+
+    URL.revokeObjectURL(url);
+    closeModal();
+}
 
 
 function closeModal() {
@@ -689,11 +742,9 @@ function closeModal() {
 }
 
 
-// وظيفة لتحديث المحتوى بناءً على الاختيارات
 function updateSubtitleContent() {
     const selectedFormat = document.getElementById('formatSelect').value;
     const fontColor = document.getElementById('fontColor').value;
-    const isSrt = selectedFormat === 'srt';
     let updatedContent;
 
     if (selectedFormat === 'ass') {
@@ -701,44 +752,54 @@ function updateSubtitleContent() {
     } else if (selectedFormat === 'sub') {
         updatedContent = convertSrtToSub(currentSrtContent);
     } else if (selectedFormat === 'webvtt') {
-        updatedContent = convertSrtToVtt(currentSrtContent); // تحديث إلى WebVTT
+        updatedContent = convertSrtToVtt(currentSrtContent);
     } else {
-        updatedContent = currentSrtContent || ''; // تأكد من وجود محتوى
+        updatedContent = currentSrtContent;
     }
 
     const srtLines = updatedContent.split('\n');
     let finalContent = '';
-    let textBlock = '';
+    let currentText = '';
 
-    srtLines.forEach(line => {
-        line = line.trim();
-        // إذا كان السطر عبارة عن رقم أو توقيت، لا يتم تعديله
-        if (/^\d+$/.test(line) || /^\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}$/.test(line)) {
-            // إذا كان هناك نص مجمع مسبقاً، نضيفه قبل إضافة الرقم أو التوقيت
-            if (textBlock) {
-                finalContent += `<font color="${fontColor}">${textBlock.trim()}</font>\n\n`; // أضف سطرين فارغين
-                textBlock = '';
+    for (let i = 0; i < srtLines.length; i++) {
+        const line = srtLines[i].trim();
+
+        // إذا كان السطر عبارة عن رقم فقط أو توقيت، فلا يتم تطبيق اللون
+        if (line.match(/^\d+$/) || line.match(/^\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}$/)) {
+            // إذا كان هناك نص مُجمع، أضف اللون عليه قبل الانتقال للسطر التالي
+            if (currentText) {
+                finalContent += `<font color="${fontColor}">${currentText}</font>\n`;
+                currentText = ''; // إعادة تعيين النص المُجمع
             }
-            finalContent += line + '\n'; // أضف الرقم أو التوقيت بدون تعديل
+            finalContent += line + '\n';
         } else if (line === '') {
-            // تجاهل الأسطر الفارغة
+            // إذا كان السطر فارغ، أضف الفاصل
+            if (currentText) {
+                finalContent += `<font color="${fontColor}">${currentText}</font>\n`;
+                currentText = ''; // إعادة تعيين النص المُجمع
+            }
+            finalContent += '\n';
         } else {
-            // تجميع السطور النصية معًا
-            textBlock += line + ' ';
+            // جمع النصوص في حالة SRT
+            if (selectedFormat === 'srt') {
+                currentText += line + ' '; // جمع النصوص
+            } else {
+                finalContent += line + '\n'; // إضافة النصوص كما هي للصيغ الأخرى
+            }
         }
-    });
+    }
 
-    // إضافة آخر كتلة نصية إذا كانت موجودة
-    if (textBlock) {
-        finalContent += `<font color="${fontColor}">${textBlock.trim()}</font>\n\n`; // أضف سطرين فارغين
+    // إذا كان هناك نص متبقي بعد معالجة جميع الأسطر، أضفه
+    if (currentText) {
+        finalContent += `<font color="${fontColor}">${currentText}</font>\n`;
     }
 
     document.getElementById('subtitleContent').value = finalContent.trim();
 }
 
-// تحديث المحتوى عند تغيير الصيغة أو اللون مباشرة
 document.getElementById('formatSelect').addEventListener('change', updateSubtitleContent);
-document.getElementById('fontColor').addEventListener('input', updateSubtitleContent); // تحديث الحقل مباشرة عند اختيار اللون
+document.getElementById('fontColor').addEventListener('input', updateSubtitleContent);
+
 
 
 function isContentReadable(text) {
