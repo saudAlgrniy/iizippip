@@ -694,13 +694,13 @@ function saveChanges() {
     } else if (selectedFormat === 'webvtt') {
         convertedContent = convertSrtToVtt(currentSrtContent);
     } else if (selectedFormat === 'srt') {
+        // عند اختيار SRT، استخدم المحتوى من حقل الإدخال
         convertedContent = document.getElementById('subtitleContent').value;
     } else {
         convertedContent = currentSrtContent;
     }
 
-    // التأكد من الترميز UTF-8
-    const blob = new Blob([convertedContent], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([convertedContent], { type: 'application/octet-stream' });
     const url = URL.createObjectURL(blob);
 
     // تعيين الامتداد الصحيح لكل صيغة
@@ -712,16 +712,16 @@ function saveChanges() {
     } else if (selectedFormat === 'webvtt') {
         fileExtension = '.vtt';
     } else if (selectedFormat === 'srt') {
-        fileExtension = '.srt';
+        fileExtension = '.srt'; // صيغة SRT
     }
 
     // إزالة أي امتداد سابق من الاسم الأصلي
-    const originalBaseName = originalFilename.split('.').slice(0, -1).join('.');
+    const originalBaseName = originalFilename.replace(/\.[^/.]+$/, '');
 
     // إضافة [font-{color}] لاسم الملف عند اختيار صيغة SRT
     let downloadFileName;
     if (selectedFormat === 'srt') {
-        const fontColor = document.getElementById('fontColor') ? document.getElementById('fontColor').value : 'default';
+        const fontColor = document.getElementById('fontColor').value; // الحصول على اللون المختار
         downloadFileName = `[font-${fontColor}] ${originalBaseName}`;
     } else {
         downloadFileName = originalBaseName;
@@ -729,7 +729,7 @@ function saveChanges() {
 
     const downloadLink = document.createElement('a');
     downloadLink.href = url;
-    downloadLink.download = `${downloadFileName}${fileExtension}`;
+    downloadLink.download = `${downloadFileName}${fileExtension}`; // استخدام الاسم المعدل مع الامتداد الجديد
     downloadLink.click();
 
     URL.revokeObjectURL(url);
@@ -741,9 +741,11 @@ function closeModal() {
     document.getElementById('editModal').style.display = 'none';
 }
 
+
 function updateSubtitleContent() {
     const selectedFormat = document.getElementById('formatSelect').value;
     const fontColor = document.getElementById('fontColor').value;
+    const isSrt = selectedFormat === 'srt';
     let updatedContent;
 
     if (selectedFormat === 'ass') {
@@ -753,33 +755,33 @@ function updateSubtitleContent() {
     } else if (selectedFormat === 'webvtt') {
         updatedContent = convertSrtToVtt(currentSrtContent); // تحديث إلى WebVTT
     } else {
-        updatedContent = currentSrtContent;
+        updatedContent = currentSrtContent || ''; // تأكد من وجود محتوى
     }
 
     const srtLines = updatedContent.split('\n');
     let finalContent = '';
 
-    for (let i = 0; i < srtLines.length; i++) {
-        const line = srtLines[i].trim();
-
-        if (line.match(/^\d+$/) || line.match(/^\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}$/)) {
+    srtLines.forEach(line => {
+        line = line.trim();
+        
+        // إذا كان السطر عبارة عن رقم فقط أو توقيت، فلا يتم تطبيق اللون
+        if (/^\d+$/.test(line) || /^\d{2}:\d{2}:\d{2},\d{3} --> \d{2}:\d{2}:\d{2},\d{3}$/.test(line)) {
             finalContent += line + '\n';
         } else if (line === '') {
             finalContent += '\n';
         } else {
-            if (selectedFormat === 'srt') {
-                finalContent += `<font color="${fontColor}">${line}</font>\n`;
-            } else {
-                finalContent += line + '\n';
-            }
+            // تطبيق اللون فقط على السطور النصية في حالة صيغة SRT
+            finalContent += isSrt ? `<font color="${fontColor}">${line}</font>\n` : line + '\n';
         }
-    }
+    });
 
     document.getElementById('subtitleContent').value = finalContent.trim();
 }
 
+// تحديث المحتوى عند تغيير الصيغة أو اللون
 document.getElementById('formatSelect').addEventListener('change', updateSubtitleContent);
 document.getElementById('fontColor').addEventListener('input', updateSubtitleContent); // تحديث الحقل مباشرة عند اختيار اللون
+
 
 function isContentReadable(text) {
     return /[\u0600-\u06FF]/.test(text);
