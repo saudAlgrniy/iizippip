@@ -689,6 +689,7 @@ function closeModal() {
 }
 
 
+// وظيفة لتحديث المحتوى بناءً على الاختيارات
 function updateSubtitleContent() {
     const selectedFormat = document.getElementById('formatSelect').value;
     const fontColor = document.getElementById('fontColor').value;
@@ -734,6 +735,10 @@ function updateSubtitleContent() {
 
     document.getElementById('subtitleContent').value = finalContent.trim();
 }
+
+// تحديث المحتوى عند تغيير الصيغة أو اللون مباشرة
+document.getElementById('formatSelect').addEventListener('change', updateSubtitleContent);
+document.getElementById('fontColor').addEventListener('input', updateSubtitleContent); // تحديث الحقل مباشرة عند اختيار اللون
 
 
 function isContentReadable(text) {
